@@ -27,7 +27,13 @@ app.options("*", cors());
 app.get("/", (req, res) => {
   res.send("Welcome to Job Hunt api");
 });
-app.post("/api/v1/dashboard/render", jobControllers.render);
+app.get("/api/v1/render", jobControllers.render);
+app.post("/api/v1/create/status", jobControllers.createStatus);
+app.post("/api/v1/create/job", jobControllers.createJob);
+app.post("/api/v1/update/status", jobControllers.updateStatus);
+app.post("/api/v1/update/job", jobControllers.updateJob);
+app.delete("/api/v1/delete/status", jobControllers.deleteStatus);
+app.delete("/api/v1/delete/job", jobControllers.deleteJob);
 
 //USER ROUTES
 app.post("/api/v1/users/register", userControllers.register);
