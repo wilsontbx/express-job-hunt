@@ -26,19 +26,20 @@ const jobControllers = {
               });
               return;
             }
-            let allResult = statusResult.map((column) => ({
-              ...column,
+            console.log(statusResult);
+            let allResult = statusResult.map((status) => ({
+              status,
               joblist: jobResult.filter(
-                (job) => job.jobstatus === column.jobstatus
+                (job) => job.jobstatus === status.jobstatus
               ),
             }));
 
             res.statusCode = 200;
             res.json({
               success: true,
-              message: "Product and Transaction found",
-              status: statusResult,
-              job: jobResult,
+              message: "Job and Status found",
+              // status: statusResult,
+              // job: jobResult,
               allResult: allResult,
             });
           })
