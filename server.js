@@ -12,20 +12,20 @@ const mongoURI = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${
 
 mongoose.set("useFindAndModify", false);
 app.use(
-    express.urlencoded({
-        extended: true,
-    })
+  express.urlencoded({
+    extended: true,
+  })
 );
 app.use(
-    cors({
-        origin: "*",
-    })
+  cors({
+    origin: "*",
+  })
 );
 app.options("*", cors());
 
 //ROUTES
 app.get("/", (req, res) => {
-    res.send("Welcome to Job Hunt api");
+  res.send("Welcome to Job Hunt api");
 });
 app.post("/api/v1/dashboard/render", jobControllers.render);
 
@@ -37,41 +37,41 @@ app.post("/api/v1/users/dashboard", userControllers.dashboard);
 // app.post("/api/v1/users/update", verifyJWT, userControllers.updateUserInfo);
 
 function verifyJWT(req, res, next) {
-    // get the jwt token from the request header
-    const authToken = req.headers.auth_token;
-    // check if authToken header value is empty, return err if empty
-    if (!authToken) {
-        res.json({
-            success: false,
-            message: "Auth header value is missing",
-        });
-        return;
-    }
+  // get the jwt token from the request header
+  const authToken = req.headers.auth_token;
+  // check if authToken header value is empty, return err if empty
+  if (!authToken) {
+    res.json({
+      success: false,
+      message: "Auth header value is missing",
+    });
+    return;
+  }
 
-    // verify that JWT is valid and not expired
-    try {
-        // if verify success, proceed
-        const userData = jwt.verify(authToken, process.env.JWT_SECRET);
-        next();
-    } catch (err) {
-        // if fail, return error msg
-        res.json({
-            success: false,
-            message: "Auth token is invalid",
-        });
-        return;
-    }
+  // verify that JWT is valid and not expired
+  try {
+    // if verify success, proceed
+    const userData = jwt.verify(authToken, process.env.JWT_SECRET);
+    next();
+  } catch (err) {
+    // if fail, return error msg
+    res.json({
+      success: false,
+      message: "Auth token is invalid",
+    });
+    return;
+  }
 }
 
 mongoose
-    .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
-    .then((response) => {
-        console.log("DB connection successful");
+  .connect(mongoURI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then((response) => {
+    console.log("DB connection successful");
 
-        app.listen(port, () => {
-            console.log(`Buy The Way app listening on port: ${port}`);
-        });
-    })
-    .catch((err) => {
-        console.log(err);
+    app.listen(port, () => {
+      console.log(`Job-hunt app listening on port: ${port}`);
     });
+  })
+  .catch((err) => {
+    console.log(err);
+  });
