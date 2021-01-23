@@ -34,7 +34,6 @@ const userControllers = {
         UserModel.create({
           first_name: req.body.first_name,
           last_name: req.body.last_name,
-          username: req.body.username,
           email: req.body.email,
           pwsalt: salt,
           hash: hash,
@@ -86,7 +85,7 @@ const userControllers = {
           res.statueCode = 401;
           res.json({
             success: false,
-            message: "Either username or password is wrong",
+            message: "Either email or password is wrong",
           });
           return;
         }
@@ -95,7 +94,6 @@ const userControllers = {
           {
             first_name: result.first_name,
             last_name: result.last_name,
-            username: result.username,
             email: result.email,
           },
           process.env.JWT_SECRET,
@@ -139,7 +137,6 @@ const userControllers = {
           success: true,
           first_name: result.first_name,
           last_name: result.last_name,
-          username: result.username,
           email: result.email,
         });
       })
@@ -150,11 +147,6 @@ const userControllers = {
           message: "unable to get user info",
         });
       });
-  },
-  dashboard: (req, res) => {
-    res.json({
-      data: "dummy",
-    });
   },
   updateUserInfo: (req, res) => {
     console.log(req.body);
