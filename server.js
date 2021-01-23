@@ -38,7 +38,6 @@ app.delete("/api/v1/delete/job", jobControllers.deleteJob);
 //USER ROUTES
 app.post("/api/v1/users/register", userControllers.register);
 app.post("/api/v1/users/login", userControllers.login);
-app.post("/api/v1/users/dashboard", userControllers.dashboard);
 // app.post("/api/v1/users/getuserinfo", verifyJWT, userControllers.getUserInfo);
 // app.post("/api/v1/users/update", verifyJWT, userControllers.updateUserInfo);
 
