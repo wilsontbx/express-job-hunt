@@ -27,7 +27,7 @@ app.options("*", cors());
 app.get("/", (req, res) => {
   res.send("Welcome to Job Hunt api");
 });
-app.get("/api/v1/render", jobControllers.render);
+app.post("/api/v1/render", jobControllers.render);
 app.post("/api/v1/create/status", jobControllers.createStatus);
 app.post("/api/v1/create/job", jobControllers.createJob);
 app.post("/api/v1/update/status", jobControllers.updateStatus);
