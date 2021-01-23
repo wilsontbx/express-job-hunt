@@ -4,7 +4,9 @@ const _ = require("lodash");
 
 const jobControllers = {
   render: (req, res) => {
-    StatusModel.find()
+    StatusModel.find({
+      useremail: req.body.useremail,
+    })
       .sort({ order: 1 }) //
       .then((statusResult) => {
         if (!statusResult) {
@@ -15,7 +17,7 @@ const jobControllers = {
           });
           return;
         }
-        JobModel.find()
+        JobModel.find({ useremail: req.body.useremail })
           .sort({ order: 1 })
           .then((jobResult) => {
             if (!jobResult) {
@@ -32,7 +34,6 @@ const jobControllers = {
                 (job) => job.jobstatus === val.jobstatus
               ),
             }));
-
             res.statusCode = 200;
             res.json({
               success: true,
