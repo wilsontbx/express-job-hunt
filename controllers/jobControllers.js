@@ -114,10 +114,15 @@ const jobControllers = {
       _id: req.body._id,
     })
       .then((result) => {
-        StatusModel.updateOne({
-          jobstatus: req.body.jobstatus,
-          order: req.body.order,
-        })
+        StatusModel.updateOne(
+          {
+            _id: req.body._id,
+          },
+          {
+            jobstatus: req.body.jobstatus,
+            order: req.body.order,
+          }
+        )
           .then((resultUpdate) => {
             res.statueCode = 201;
             res.json({
@@ -147,16 +152,21 @@ const jobControllers = {
       _id: req.body._id,
     })
       .then((result) => {
-        JobModel.updateOne({
-          jobstatus: req.body.jobstatus,
-          companyname: req.body.companyname,
-          jobname: req.body.jobname,
-          preparation: req.body.preparation,
-          interviewquestion: req.body.interviewquestion,
-          interviewexperience: req.body.interviewexperience,
-          salary: req.body.salary,
-          order: req.body.order,
-        })
+        JobModel.updateOne(
+          {
+            _id: req.body._id,
+          },
+          {
+            jobstatus: req.body.jobstatus,
+            companyname: req.body.companyname,
+            jobname: req.body.jobname,
+            preparation: req.body.preparation,
+            interviewquestion: req.body.interviewquestion,
+            interviewexperience: req.body.interviewexperience,
+            salary: req.body.salary,
+            order: req.body.order,
+          }
+        )
           .then((resultUpdate) => {
             res.statueCode = 201;
             res.json({
