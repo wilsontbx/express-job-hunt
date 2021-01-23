@@ -26,11 +26,10 @@ const jobControllers = {
               });
               return;
             }
-            console.log(statusResult);
-            let allResult = statusResult.map((status) => ({
-              status,
+            let allResult = statusResult.map((val) => ({
+              status: val,
               joblist: jobResult.filter(
-                (job) => job.jobstatus === status.jobstatus
+                (job) => job.jobstatus === val.jobstatus
               ),
             }));
 
