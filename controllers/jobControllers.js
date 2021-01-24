@@ -5,7 +5,7 @@ const _ = require("lodash");
 const jobControllers = {
   render: (req, res) => {
     StatusModel.find({
-      useremail: req.body.useremail,
+      email: req.body.email,
     })
       .sort({ order: 1 }) //
       .then((statusResult) => {
@@ -17,7 +17,7 @@ const jobControllers = {
           });
           return;
         }
-        JobModel.find({ useremail: req.body.useremail })
+        JobModel.find({ email: req.body.email })
           .sort({ order: 1 })
           .then((jobResult) => {
             if (!jobResult) {
@@ -38,8 +38,6 @@ const jobControllers = {
             res.json({
               success: true,
               message: "Job and Status found",
-              // status: statusResult,
-              // job: jobResult,
               allResult: allResult,
             });
           })
@@ -61,7 +59,7 @@ const jobControllers = {
   },
   createStatus: (req, res) => {
     StatusModel.create({
-      useremail: req.body.useremail,
+      email: req.body.email,
       jobstatus: req.body.jobstatus,
       order: req.body.order,
     })
@@ -83,7 +81,7 @@ const jobControllers = {
   },
   createJob: (req, res) => {
     JobModel.create({
-      useremail: req.body.useremail,
+      email: req.body.email,
       jobstatus: req.body.jobstatus,
       companyname: req.body.companyname,
       jobname: req.body.jobname,
@@ -148,40 +146,68 @@ const jobControllers = {
       });
   },
   updateJob: (req, res) => {
+    const dragStatus = req.body.drag;
     JobModel.findOne({
       _id: req.body._id,
     })
       .then((result) => {
-        JobModel.updateOne(
-          {
-            _id: req.body._id,
-          },
-          {
-            jobstatus: req.body.jobstatus,
-            companyname: req.body.companyname,
-            jobname: req.body.jobname,
-            preparation: req.body.preparation,
-            interviewquestion: req.body.interviewquestion,
-            interviewexperience: req.body.interviewexperience,
-            salary: req.body.salary,
-            order: req.body.order,
-          }
-        )
-          .then((resultUpdate) => {
-            res.statueCode = 201;
-            res.json({
-              success: true,
-              result: resultUpdate,
-              message: "success edit new job/change job order",
+        if (dragStatus) {
+          JobModel.updateOne(
+            {
+              _id: req.body._id,
+            },
+            {
+              jobstatus: req.body.jobstatus,
+              order: req.body.order,
+            }
+          )
+            .then((resultUpdate) => {
+              res.statueCode = 201;
+              res.json({
+                success: true,
+                result: resultUpdate,
+                message: "success change job order",
+              });
+            })
+            .catch((err) => {
+              res.statueCode = 409;
+              res.json({
+                success: false,
+                message: "fail to change job order",
+              });
             });
-          })
-          .catch((err) => {
-            res.statueCode = 409;
-            res.json({
-              success: false,
-              message: "fail to edit new job/change job order",
+        } else {
+          JobModel.updateOne(
+            {
+              _id: req.body._id,
+            },
+            {
+              jobstatus: req.body.jobstatus,
+              order: req.body.order,
+              companyname: req.body.companyname,
+              jobname: req.body.jobname,
+              preparation: req.body.preparation,
+              interviewquestion: req.body.interviewquestion,
+              interviewexperience: req.body.interviewexperience,
+              salary: req.body.salary,
+            }
+          )
+            .then((resultUpdate) => {
+              res.statueCode = 201;
+              res.json({
+                success: true,
+                result: resultUpdate,
+                message: "success edit job order",
+              });
+            })
+            .catch((err) => {
+              res.statueCode = 409;
+              res.json({
+                success: false,
+                message: "fail to edit job order",
+              });
             });
-          });
+        }
       })
       .catch((err) => {
         res.statueCode = 409;

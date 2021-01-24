@@ -1,10 +1,7 @@
 const mongoose = require("mongoose");
 
 const jobSchema = new mongoose.Schema({
-  jobidslug: {
-    type: String,
-  },
-  useremail: {
+  email: {
     type: String,
     required: true,
   },
@@ -21,7 +18,7 @@ const jobSchema = new mongoose.Schema({
     required: true,
   },
   preparation: String,
-  interviewquestion: [String],
+  interviewquestion: String,
   interviewexperience: String,
   salary: Number,
   order: Number,
