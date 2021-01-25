@@ -108,6 +108,7 @@ const userControllers = {
           success: true,
           token: token,
           expiresAt: rawJWT.exp,
+          useremail: rawJWT.email,
         });
       })
       .catch((err) => {
