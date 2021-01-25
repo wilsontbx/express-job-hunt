@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 // this schema is just for supporting the job
 const statusSchema = new mongoose.Schema({
-  useremail: {
+  email: {
     type: String,
     required: true,
   },
