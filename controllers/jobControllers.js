@@ -175,19 +175,20 @@ const jobControllers = {
       });
   },
   dragStatus: (req, res) => {
-    let { jobid, oldstatus, oldorder, newstatus, neworder } = req.body;
+    let { jobid, oldId, oldorder, newID, neworder } = req.body;
   },
   dragJob: (req, res) => {
-    const { jobid, oldstatus, oldorder, newstatus, neworder } = req.body;
+    const { jobid, oldId, oldorder, newId, neworder } = req.body;
+    console.log(req.body);
     JobModel.findOneAndUpdate(
-      { jobstatus: oldstatus },
+      { _id: oldId },
       { $pull: { joblist: { _id: jobid } } },
       { projection: { joblist: true } }
     )
       .then((result) => {
         const pullResult = result.joblist[oldorder];
         JobModel.updateOne(
-          { jobstatus: newstatus },
+          { _id: newId },
           {
             $push: {
               joblist: { $each: [pullResult], $position: neworder },
