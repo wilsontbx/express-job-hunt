@@ -9,19 +9,21 @@ const jobSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  companyname: {
-    type: String,
+  order: {
+    type: Number,
     required: true,
   },
-  jobname: {
-    type: String,
-    required: true,
-  },
-  preparation: String,
-  interviewquestion: String,
-  interviewexperience: String,
-  salary: Number,
-  order: Number,
+  joblist: [
+    {
+      _id: { type: String, required: true },
+      companyname: { type: String, required: true },
+      jobname: { type: String, required: true },
+      preparation: String,
+      interviewquestion: String,
+      interviewexperience: String,
+      salary: Number,
+    },
+  ],
   created_at: {
     type: Date,
     required: true,
@@ -34,6 +36,6 @@ const jobSchema = new mongoose.Schema({
   },
 });
 
-const JobModel = mongoose.model("Job", jobSchema);
+const jobModel = mongoose.model("job", jobSchema);
 
-module.exports = JobModel;
+module.exports = jobModel;
