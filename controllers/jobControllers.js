@@ -1,15 +1,16 @@
 const JobModel = require("../models/job");
-const StatusModel = require("../models/Status");
-const _ = require("lodash");
+const shortid = require("shortid");
+const jobModel = require("../models/job");
 
 const jobControllers = {
   render: (req, res) => {
-    StatusModel.find({
-      email: req.body.email,
+    const { email } = req.body;
+    JobModel.find({
+      email: email,
     })
-      .sort({ order: 1 }) //
-      .then((statusResult) => {
-        if (!statusResult) {
+      .sort({ order: 1 })
+      .then((allResult) => {
+        if (!allResult) {
           res.statueCode = 401;
           res.json({
             success: false,
@@ -17,37 +18,13 @@ const jobControllers = {
           });
           return;
         }
-        JobModel.find({ email: req.body.email })
-          .sort({ order: 1 })
-          .then((jobResult) => {
-            if (!jobResult) {
-              res.statueCode = 401;
-              res.json({
-                success: false,
-                message: "There no job for this user",
-              });
-              return;
-            }
-            let allResult = statusResult.map((val) => ({
-              status: val,
-              joblist: jobResult.filter(
-                (job) => job.jobstatus === val.jobstatus
-              ),
-            }));
-            res.statusCode = 200;
-            res.json({
-              success: true,
-              message: "Job and Status found",
-              allResult: allResult,
-            });
-          })
-          .catch((err) => {
-            res.statusCode = 401;
-            res.json({
-              success: false,
-              message: "user unauthorized (job)",
-            });
-          });
+
+        res.statusCode = 200;
+        res.json({
+          success: true,
+          message: "Job and Status found",
+          allResult: allResult,
+        });
       })
       .catch((err) => {
         res.statusCode = 401;
@@ -58,10 +35,11 @@ const jobControllers = {
       });
   },
   createStatus: (req, res) => {
-    StatusModel.create({
-      email: req.body.email,
-      jobstatus: req.body.jobstatus,
-      order: req.body.order,
+    const { email, jobstatus, order } = req.body;
+    JobModel.create({
+      email: email,
+      jobstatus: jobstatus,
+      order: order,
     })
       .then((result) => {
         res.statueCode = 201;
@@ -80,17 +58,32 @@ const jobControllers = {
       });
   },
   createJob: (req, res) => {
-    JobModel.create({
-      email: req.body.email,
-      jobstatus: req.body.jobstatus,
-      companyname: req.body.companyname,
-      jobname: req.body.jobname,
-      preparation: req.body.preparation,
-      interviewquestion: req.body.interviewquestion,
-      interviewexperience: req.body.interviewexperience,
-      salary: req.body.salary,
-      order: req.body.order,
-    })
+    const listId = shortid.generate();
+    const {
+      jobstatus,
+      companyname,
+      jobname,
+      preparation,
+      interviewquestion,
+      interviewexperience,
+      salary,
+    } = req.body;
+    JobModel.updateOne(
+      { jobstatus: jobstatus },
+      {
+        $push: {
+          joblist: {
+            _id: listId,
+            companyname: companyname,
+            jobname: jobname,
+            preparation: preparation,
+            interviewquestion: interviewquestion,
+            interviewexperience: interviewexperience,
+            salary: salary,
+          },
+        },
+      }
+    )
       .then((result) => {
         res.statueCode = 201;
         res.json({
@@ -108,17 +101,98 @@ const jobControllers = {
       });
   },
   updateStatus: (req, res) => {
-    StatusModel.findOne({
-      _id: req.body._id,
-    })
-      .then((result) => {
-        StatusModel.updateOne(
-          {
-            _id: req.body._id,
+    const { statusid, jobstatus, order } = req.body;
+    JobModel.updateOne(
+      {
+        _id: statusid,
+      },
+      {
+        jobstatus: jobstatus,
+        order: order,
+      }
+    )
+      .then((resultUpdate) => {
+        res.statueCode = 201;
+        res.json({
+          success: true,
+          result: resultUpdate,
+          message: "success edit new status/change status order",
+        });
+      })
+      .catch((err) => {
+        res.statueCode = 409;
+        res.json({
+          success: false,
+          message: "fail to edit new status/change status order",
+        });
+      });
+  },
+  updateJob: (req, res) => {
+    const {
+      jobstatus,
+      index,
+      companyname,
+      jobname,
+      preparation,
+      interviewquestion,
+      interviewexperience,
+      salary,
+    } = req.body;
+    const listId = shortid.generate();
+    const jobidx = `joblist.${index}`;
+    JobModel.updateOne(
+      {
+        jobstatus: jobstatus,
+      },
+      {
+        $set: {
+          [jobidx]: {
+            _id: listId,
+            companyname: companyname,
+            jobname: jobname,
+            preparation: preparation,
+            interviewquestion: interviewquestion,
+            interviewexperience: interviewexperience,
+            salary: salary,
           },
+        },
+      }
+    )
+      .then((resultUpdate) => {
+        res.statueCode = 201;
+        res.json({
+          success: true,
+          result: resultUpdate,
+          message: "success edit job order",
+        });
+      })
+      .catch((err) => {
+        res.statueCode = 409;
+        res.json({
+          success: false,
+          message: "fail to edit job order",
+        });
+      });
+  },
+  dragStatus: (req, res) => {
+    let { jobid, oldId, oldorder, newID, neworder } = req.body;
+  },
+  dragJob: (req, res) => {
+    const { jobid, oldId, oldorder, newId, neworder } = req.body;
+    console.log(req.body);
+    JobModel.findOneAndUpdate(
+      { _id: oldId },
+      { $pull: { joblist: { _id: jobid } } },
+      { projection: { joblist: true } }
+    )
+      .then((result) => {
+        const pullResult = result.joblist[oldorder];
+        JobModel.updateOne(
+          { _id: newId },
           {
-            jobstatus: req.body.jobstatus,
-            order: req.body.order,
+            $push: {
+              joblist: { $each: [pullResult], $position: neworder },
+            },
           }
         )
           .then((resultUpdate) => {
@@ -126,14 +200,14 @@ const jobControllers = {
             res.json({
               success: true,
               result: resultUpdate,
-              message: "success edit new status/change status order",
+              message: "success drag job order",
             });
           })
           .catch((err) => {
             res.statueCode = 409;
             res.json({
               success: false,
-              message: "fail to edit new status/change status order",
+              message: "fail to drag job order",
             });
           });
       })
@@ -141,143 +215,53 @@ const jobControllers = {
         res.statueCode = 409;
         res.json({
           success: false,
-          message: "fail to find status id",
-        });
-      });
-  },
-  updateJob: (req, res) => {
-    const dragStatus = req.body.drag;
-    JobModel.findOne({
-      _id: req.body._id,
-    })
-      .then((result) => {
-        if (dragStatus) {
-          JobModel.updateOne(
-            {
-              _id: req.body._id,
-            },
-            {
-              jobstatus: req.body.jobstatus,
-              order: req.body.order,
-            }
-          )
-            .then((resultUpdate) => {
-              res.statueCode = 201;
-              res.json({
-                success: true,
-                result: resultUpdate,
-                message: "success change job order",
-              });
-            })
-            .catch((err) => {
-              res.statueCode = 409;
-              res.json({
-                success: false,
-                message: "fail to change job order",
-              });
-            });
-        } else {
-          JobModel.updateOne(
-            {
-              _id: req.body._id,
-            },
-            {
-              jobstatus: req.body.jobstatus,
-              order: req.body.order,
-              companyname: req.body.companyname,
-              jobname: req.body.jobname,
-              preparation: req.body.preparation,
-              interviewquestion: req.body.interviewquestion,
-              interviewexperience: req.body.interviewexperience,
-              salary: req.body.salary,
-            }
-          )
-            .then((resultUpdate) => {
-              res.statueCode = 201;
-              res.json({
-                success: true,
-                result: resultUpdate,
-                message: "success edit job order",
-              });
-            })
-            .catch((err) => {
-              res.statueCode = 409;
-              res.json({
-                success: false,
-                message: "fail to edit job order",
-              });
-            });
-        }
-      })
-      .catch((err) => {
-        res.statueCode = 409;
-        res.json({
-          success: false,
-          message: "fail to find job id",
+          message: "fail to drag out",
         });
       });
   },
   deleteStatus: (req, res) => {
-    StatusModel.findOne({
+    JobModel.deleteOne({
       _id: req.body._id,
     })
-      .then((result) => {
-        StatusModel.deleteOne({
-          _id: req.body._id,
-        })
-          .then((resultDelete) => {
-            res.statueCode = 201;
-            res.json({
-              success: true,
-              result: resultDelete,
-              message: "success delete status",
-            });
-          })
-          .catch((err) => {
-            res.statueCode = 409;
-            res.json({
-              success: false,
-              message: "fail to delete status",
-            });
-          });
+      .then((resultDelete) => {
+        res.statueCode = 201;
+        res.json({
+          success: true,
+          result: resultDelete,
+          message: "success delete status",
+        });
       })
       .catch((err) => {
         res.statueCode = 409;
         res.json({
           success: false,
-          message: "fail to find status id",
+          message: "fail to delete status",
         });
       });
   },
   deleteJob: (req, res) => {
-    JobModel.findOne({
-      _id: req.body._id,
-    })
-      .then((result) => {
-        JobModel.deleteOne({
-          _id: req.body._id,
-        })
-          .then((resultDelete) => {
-            res.statueCode = 201;
-            res.json({
-              success: true,
-              result: resultDelete,
-              message: "success delete job",
-            });
-          })
-          .catch((err) => {
-            res.statueCode = 409;
-            res.json({
-              success: false,
-              message: "fail to delete job",
-            });
-          });
+    const { statusid, jobid } = req.body;
+    JobModel.updateOne(
+      {
+        _id: statusid,
+      },
+      {
+        $pull: { joblist: { _id: jobid } },
+      }
+    )
+      .then((resultDelete) => {
+        res.statueCode = 201;
+        res.json({
+          success: true,
+          result: resultDelete,
+          message: "success delete job",
+        });
       })
       .catch((err) => {
         res.statueCode = 409;
         res.json({
           success: false,
-          message: "fail to find job id",
+          message: "fail to delete job",
         });
       });
   },

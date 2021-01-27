@@ -1,5 +1,5 @@
 const mongoose = require("mongoose");
-// this schema is just for supporting the job
+
 const statusSchema = new mongoose.Schema({
   email: {
     type: String,
@@ -9,10 +9,17 @@ const statusSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  order: {
-    type: Number,
-    required: true,
-  },
+  joblist: [
+    {
+      _id: { type: String, required: true },
+      companyname: { type: String, required: true },
+      jobname: { type: String, required: true },
+      preparation: String,
+      interviewquestion: String,
+      interviewexperience: String,
+      salary: Number,
+    },
+  ],
   created_at: {
     type: Date,
     required: true,
