@@ -175,7 +175,49 @@ const jobControllers = {
       });
   },
   dragStatus: (req, res) => {
-    let { jobid, oldId, oldorder, newID, neworder } = req.body;
+    const { statusid, oldorder, neworder } = req.body;
+    let start,
+      end,
+      condition = 0;
+    if (neworder > oldorder) {
+      start = oldorder;
+      end = neworder;
+      condition = -1;
+    } else {
+      start = neworder;
+      end = oldorder;
+      condition = 1;
+    }
+
+    JobModel.updateMany(
+      { order: { $gte: start, $lte: end } },
+      { $inc: { order: condition } }
+    )
+      .then((result) => {
+        JobModel.updateOne({ _id: statusid }, { order: neworder })
+          .then((updateResult) => {
+            res.statueCode = 201;
+            res.json({
+              success: true,
+              result: updateResult,
+              message: "success to update destination status ",
+            });
+          })
+          .catch((err) => {
+            res.statueCode = 409;
+            res.json({
+              success: false,
+              message: "fail to update destination status ",
+            });
+          });
+      })
+      .catch((err) => {
+        res.statueCode = 409;
+        res.json({
+          success: false,
+          message: "fail to update many status ",
+        });
+      });
   },
   dragJob: (req, res) => {
     const { jobid, oldstatus, oldorder, newstatus, neworder } = req.body;
