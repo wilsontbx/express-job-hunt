@@ -39,10 +39,24 @@ const userControllers = {
           hash: hash,
         })
           .then((createResult) => {
+            const token = jwt.sign(
+              {
+                first_name: createResult.first_name,
+                last_name: createResult.last_name,
+                email: createResult.email,
+              },
+              process.env.JWT_SECRET,
+              {
+                expiresIn: "1h",
+              }
+            );
+            const rawJWT = jwt.decode(token);
             res.statueCode = 201;
             res.json({
               success: true,
-              message: "registration is successful",
+              token: token,
+              expiresAt: rawJWT.exp,
+              info: rawJWT,
             });
           })
           .catch((err) => {
