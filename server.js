@@ -30,12 +30,12 @@ app.get("/", (req, res) => {
 app.post("/api/v1/render", jobControllers.render);
 app.post("/api/v1/create/status", jobControllers.createStatus);
 app.post("/api/v1/create/job", jobControllers.createJob);
-app.post("/api/v1/update/status", jobControllers.updateStatus);
-app.post("/api/v1/update/job", jobControllers.updateJob);
-app.post("/api/v1/drag/status", jobControllers.dragStatus);
-app.post("/api/v1/drag/job", jobControllers.dragJob);
-app.post("/api/v1/delete/status", jobControllers.deleteStatus);
-app.post("/api/v1/delete/job", jobControllers.deleteJob);
+app.patch("/api/v1/update/status", jobControllers.updateStatus);
+app.patch("/api/v1/update/job", jobControllers.updateJob);
+app.patch("/api/v1/drag/status", jobControllers.dragStatus);
+app.patch("/api/v1/drag/job", jobControllers.dragJob);
+app.delete("/api/v1/delete/status", jobControllers.deleteStatus);
+app.patch("/api/v1/delete/job", jobControllers.deleteJob);
 
 //USER ROUTES
 app.post("/api/v1/users/register", userControllers.register);

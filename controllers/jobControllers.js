@@ -129,7 +129,7 @@ const jobControllers = {
   },
   updateJob: (req, res) => {
     const {
-      jobstatus,
+      _id,
       index,
       companyname,
       jobname,
@@ -142,7 +142,7 @@ const jobControllers = {
     const jobidx = `joblist.${index}`;
     JobModel.updateOne(
       {
-        jobstatus: jobstatus,
+        _id: _id,
       },
       {
         $set: {
