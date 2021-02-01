@@ -16,8 +16,8 @@ const jobSchema = new mongoose.Schema({
   joblist: [
     {
       _id: { type: String, required: true },
-      companyname: { type: String, required: true },
-      jobname: { type: String, required: true },
+      companyname: { type: String, required: true, default: "" },
+      jobname: { type: String, required: true, default: "" },
       preparation: { type: String, required: true, default: "" },
       interviewquestion: { type: String, required: true, default: "" },
       interviewexperience: { type: String, required: true, default: "" },
