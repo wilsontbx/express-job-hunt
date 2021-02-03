@@ -11,7 +11,7 @@ const jobControllers = {
       .sort({ order: 1 })
       .then((allResult) => {
         if (!allResult) {
-          res.statueCode = 401;
+          res.statusCode = 401;
           res.json({
             success: false,
             message: "The is job status column is empty",
@@ -42,7 +42,7 @@ const jobControllers = {
       order: order,
     })
       .then((result) => {
-        res.statueCode = 201;
+        res.statusCode = 201;
         res.json({
           success: true,
           result: result,
@@ -50,7 +50,7 @@ const jobControllers = {
         });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to create new status",
@@ -85,7 +85,7 @@ const jobControllers = {
       }
     )
       .then((result) => {
-        res.statueCode = 201;
+        res.statusCode = 201;
         res.json({
           success: true,
           result: result,
@@ -93,7 +93,7 @@ const jobControllers = {
         });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to create new job",
@@ -112,7 +112,7 @@ const jobControllers = {
       }
     )
       .then((resultUpdate) => {
-        res.statueCode = 201;
+        res.statusCode = 201;
         res.json({
           success: true,
           result: resultUpdate,
@@ -120,7 +120,7 @@ const jobControllers = {
         });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to edit new status/change status order",
@@ -159,7 +159,7 @@ const jobControllers = {
       }
     )
       .then((resultUpdate) => {
-        res.statueCode = 201;
+        res.statusCode = 201;
         res.json({
           success: true,
           result: resultUpdate,
@@ -167,7 +167,7 @@ const jobControllers = {
         });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to edit job order",
@@ -196,7 +196,7 @@ const jobControllers = {
       .then((result) => {
         JobModel.updateOne({ _id: statusid }, { order: neworder })
           .then((updateResult) => {
-            res.statueCode = 201;
+            res.statusCode = 201;
             res.json({
               success: true,
               result: updateResult,
@@ -204,7 +204,7 @@ const jobControllers = {
             });
           })
           .catch((err) => {
-            res.statueCode = 409;
+            res.statusCode = 409;
             res.json({
               success: false,
               message: "fail to update destination status ",
@@ -212,7 +212,7 @@ const jobControllers = {
           });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to update many status ",
@@ -237,7 +237,7 @@ const jobControllers = {
           }
         )
           .then((resultUpdate) => {
-            res.statueCode = 201;
+            res.statusCode = 201;
             res.json({
               success: true,
               result: resultUpdate,
@@ -245,7 +245,7 @@ const jobControllers = {
             });
           })
           .catch((err) => {
-            res.statueCode = 409;
+            res.statusCode = 409;
             res.json({
               success: false,
               message: "fail to drag job order",
@@ -253,7 +253,7 @@ const jobControllers = {
           });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to drag out",
@@ -265,7 +265,7 @@ const jobControllers = {
       _id: req.body._id,
     })
       .then((resultDelete) => {
-        res.statueCode = 201;
+        res.statusCode = 201;
         res.json({
           success: true,
           result: resultDelete,
@@ -273,7 +273,7 @@ const jobControllers = {
         });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to delete status",
@@ -291,7 +291,7 @@ const jobControllers = {
       }
     )
       .then((resultDelete) => {
-        res.statueCode = 201;
+        res.statusCode = 201;
         res.json({
           success: true,
           result: resultDelete,
@@ -299,7 +299,7 @@ const jobControllers = {
         });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to delete job",

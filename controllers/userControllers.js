@@ -11,7 +11,7 @@ const userControllers = {
       .then((result) => {
         // if found in DB, means email has already been take, redirect to registration page
         if (result) {
-          res.statueCode = 409;
+          res.statusCode = 409;
           res.json({
             success: false,
             message: "The register email is exist",
@@ -51,7 +51,7 @@ const userControllers = {
               }
             );
             const rawJWT = jwt.decode(token);
-            res.statueCode = 201;
+            res.statusCode = 201;
             res.json({
               success: true,
               token: token,
@@ -60,7 +60,7 @@ const userControllers = {
             });
           })
           .catch((err) => {
-            res.statueCode = 409;
+            res.statusCode = 409;
             res.json({
               success: false,
               message: "unable to register due to unexpected error",
@@ -68,7 +68,7 @@ const userControllers = {
           });
       })
       .catch((err) => {
-        res.statueCode = 409;
+        res.statusCode = 409;
         res.json({
           success: false,
           message: "The register email is exist",
@@ -83,7 +83,7 @@ const userControllers = {
       .then((result) => {
         // check if result is empty, if it is, no user, so login fail, redirect to login page
         if (!result) {
-          res.statueCode = 401;
+          res.statusCode = 401;
           res.json({
             success: false,
             message: "Either email or password is wrong",
@@ -96,7 +96,7 @@ const userControllers = {
 
         // check if password is correct by comparing hashes
         if (hash !== result.hash) {
-          res.statueCode = 401;
+          res.statusCode = 401;
           res.json({
             success: false,
             message: "Either email or password is wrong",
@@ -141,7 +141,7 @@ const userControllers = {
     })
       .then((result) => {
         if (!result) {
-          res.statueCode = 401;
+          res.statusCode = 401;
           res.json({
             success: false,
             message: "token is invalid",
