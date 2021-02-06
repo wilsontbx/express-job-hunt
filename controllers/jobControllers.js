@@ -1,6 +1,7 @@
 const JobModel = require("../models/job");
 const shortid = require("shortid");
 const NotificationModel = require("../models/notification");
+const { emit } = require("../models/job");
 
 const jobControllers = {
   render: (req, res) => {
@@ -103,6 +104,7 @@ const jobControllers = {
   },
   updateStatus: (req, res) => {
     const { email, statusid, jobstatus, order } = req.body;
+    console.log(email);
     JobModel.updateOne(
       {
         email: email,
@@ -234,7 +236,7 @@ const jobControllers = {
       .then((result) => {
         const pullResult = result.joblist[oldorder];
         JobModel.updateOne(
-          { jobstatus: newstatus },
+          { email: email, jobstatus: newstatus },
           {
             $push: {
               joblist: { $each: [pullResult], $position: neworder },
