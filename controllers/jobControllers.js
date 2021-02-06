@@ -60,6 +60,7 @@ const jobControllers = {
   createJob: (req, res) => {
     const listId = shortid.generate();
     const {
+      email,
       jobstatus,
       companyname,
       jobname,
@@ -69,7 +70,7 @@ const jobControllers = {
       salary,
     } = req.body;
     JobModel.updateOne(
-      { jobstatus: jobstatus },
+      { email: email, jobstatus: jobstatus },
       {
         $push: {
           joblist: {
@@ -101,9 +102,10 @@ const jobControllers = {
       });
   },
   updateStatus: (req, res) => {
-    const { statusid, jobstatus, order } = req.body;
+    const { email, statusid, jobstatus, order } = req.body;
     JobModel.updateOne(
       {
+        email: email,
         _id: statusid,
       },
       {
@@ -129,6 +131,7 @@ const jobControllers = {
   },
   updateJob: (req, res) => {
     const {
+      email,
       _id,
       index,
       companyname,
@@ -140,8 +143,10 @@ const jobControllers = {
     } = req.body;
     const listId = shortid.generate();
     const jobidx = `joblist.${index}`;
+    console.log(email);
     JobModel.updateOne(
       {
+        email: email,
         _id: _id,
       },
       {
@@ -175,7 +180,7 @@ const jobControllers = {
       });
   },
   dragStatus: (req, res) => {
-    const { statusid, oldorder, neworder } = req.body;
+    const { email, statusid, oldorder, neworder } = req.body;
     let start,
       end,
       condition = 0;
@@ -190,11 +195,11 @@ const jobControllers = {
     }
 
     JobModel.updateMany(
-      { order: { $gte: start, $lte: end } },
+      { email: email, order: { $gte: start, $lte: end } },
       { $inc: { order: condition } }
     )
       .then((result) => {
-        JobModel.updateOne({ _id: statusid }, { order: neworder })
+        JobModel.updateOne({ email: email, _id: statusid }, { order: neworder })
           .then((updateResult) => {
             res.statusCode = 201;
             res.json({
@@ -220,9 +225,9 @@ const jobControllers = {
       });
   },
   dragJob: (req, res) => {
-    const { jobid, oldstatus, oldorder, newstatus, neworder } = req.body;
+    const { email, jobid, oldstatus, oldorder, newstatus, neworder } = req.body;
     JobModel.findOneAndUpdate(
-      { jobstatus: oldstatus },
+      { email: email, jobstatus: oldstatus },
       { $pull: { joblist: { _id: jobid } } },
       { projection: { joblist: true } }
     )
@@ -261,8 +266,10 @@ const jobControllers = {
       });
   },
   deleteStatus: (req, res) => {
+    const { email, _id } = req.body;
     JobModel.deleteOne({
-      _id: req.body._id,
+      email: email,
+      _id: _id,
     })
       .then((resultDelete) => {
         res.statusCode = 201;
@@ -281,9 +288,10 @@ const jobControllers = {
       });
   },
   deleteJob: (req, res) => {
-    const { statusid, jobid } = req.body;
+    const { email, statusid, jobid } = req.body;
     JobModel.updateOne(
       {
+        email: email,
         _id: statusid,
       },
       {
