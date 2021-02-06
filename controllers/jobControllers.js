@@ -1,6 +1,6 @@
 const JobModel = require("../models/job");
 const shortid = require("shortid");
-const jobModel = require("../models/job");
+const NotificationModel = require("../models/notification");
 
 const jobControllers = {
   render: (req, res) => {

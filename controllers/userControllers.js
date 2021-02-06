@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const UserModel = require("../models/users");
 const SHA256 = require("crypto-js/sha256");
 const uuid = require("uuid");
+const NotificationModel = require("../models/notification");
 
 const userControllers = {
   register: (req, res) => {
@@ -18,19 +19,9 @@ const userControllers = {
           });
           return;
         }
-
-        // no document found in DB, can proceed with registration
-
-        // generate uuid as salt
         const salt = uuid.v4();
-
-        // hash combination using bcrypt
         const combination = salt + req.body.password;
-
-        // hash the combination using SHA256
         const hash = SHA256(combination).toString();
-
-        // create user in DB
         UserModel.create({
           first_name: req.body.first_name,
           last_name: req.body.last_name,
@@ -39,25 +30,36 @@ const userControllers = {
           hash: hash,
         })
           .then((createResult) => {
-            const token = jwt.sign(
-              {
-                first_name: createResult.first_name,
-                last_name: createResult.last_name,
-                email: createResult.email,
-              },
-              process.env.JWT_SECRET,
-              {
-                expiresIn: "1h",
-              }
-            );
-            const rawJWT = jwt.decode(token);
-            res.statusCode = 201;
-            res.json({
-              success: true,
-              token: token,
-              expiresAt: rawJWT.exp,
-              info: rawJWT,
-            });
+            NotificationModel.create({ email: req.body.email })
+              .then((notificationResult) => {
+                const token = jwt.sign(
+                  {
+                    first_name: createResult.first_name,
+                    last_name: createResult.last_name,
+                    email: createResult.email,
+                  },
+                  process.env.JWT_SECRET,
+                  {
+                    expiresIn: "1h",
+                  }
+                );
+                const rawJWT = jwt.decode(token);
+                res.statusCode = 201;
+                res.json({
+                  success: true,
+                  token: token,
+                  expiresAt: rawJWT.exp,
+                  info: rawJWT,
+                  activity: true,
+                });
+              })
+              .catch((err) => {
+                res.statusCode = 409;
+                res.json({
+                  success: false,
+                  message: "unable to create activity due to unexpected error",
+                });
+              });
           })
           .catch((err) => {
             res.statusCode = 409;
