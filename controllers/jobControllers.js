@@ -62,7 +62,7 @@ const jobControllers = {
     const listId = shortid.generate();
     const {
       email,
-      jobstatus,
+      statusid,
       companyname,
       jobname,
       preparation,
@@ -71,7 +71,7 @@ const jobControllers = {
       salary,
     } = req.body;
     JobModel.updateOne(
-      { email: email, jobstatus: jobstatus },
+      { email: email, _id: statusid },
       {
         $push: {
           joblist: {
@@ -104,7 +104,6 @@ const jobControllers = {
   },
   updateStatus: (req, res) => {
     const { email, statusid, jobstatus, order } = req.body;
-    console.log(email);
     JobModel.updateOne(
       {
         email: email,
@@ -134,7 +133,7 @@ const jobControllers = {
   updateJob: (req, res) => {
     const {
       email,
-      _id,
+      statusid,
       index,
       companyname,
       jobname,
@@ -145,11 +144,10 @@ const jobControllers = {
     } = req.body;
     const listId = shortid.generate();
     const jobidx = `joblist.${index}`;
-    console.log(email);
     JobModel.updateOne(
       {
         email: email,
-        _id: _id,
+        _id: statusid,
       },
       {
         $set: {
@@ -227,16 +225,23 @@ const jobControllers = {
       });
   },
   dragJob: (req, res) => {
-    const { email, jobid, oldstatus, oldorder, newstatus, neworder } = req.body;
+    const {
+      email,
+      jobid,
+      oldstatusid,
+      oldorder,
+      newstatusid,
+      neworder,
+    } = req.body;
     JobModel.findOneAndUpdate(
-      { email: email, jobstatus: oldstatus },
+      { email: email, _id: oldstatusid },
       { $pull: { joblist: { _id: jobid } } },
       { projection: { joblist: true } }
     )
       .then((result) => {
         const pullResult = result.joblist[oldorder];
         JobModel.updateOne(
-          { email: email, jobstatus: newstatus },
+          { email: email, _id: newstatusid },
           {
             $push: {
               joblist: { $each: [pullResult], $position: neworder },
