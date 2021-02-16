@@ -1,7 +1,6 @@
 const JobModel = require("../models/job");
 const shortid = require("shortid");
 const NotificationModel = require("../models/notification");
-const { emit } = require("../models/job");
 
 const jobControllers = {
   render: (req, res) => {
@@ -43,12 +42,33 @@ const jobControllers = {
       order: order,
     })
       .then((result) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: result,
-          message: "success create new status",
-        });
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: { description: "added", status: jobstatus },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: result,
+              message: "success create new status",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to create new status",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;
@@ -63,6 +83,7 @@ const jobControllers = {
     const {
       email,
       statusid,
+      statusName,
       companyname,
       jobname,
       preparation,
@@ -87,12 +108,38 @@ const jobControllers = {
       }
     )
       .then((result) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: result,
-          message: "success create new job",
-        });
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: {
+                description: "added",
+                companyname: companyname,
+                jobname: jobname,
+                status: statusName,
+              },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: result,
+              message: "success create new job",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to create new job",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;
@@ -103,7 +150,7 @@ const jobControllers = {
       });
   },
   updateStatus: (req, res) => {
-    const { email, statusid, jobstatus, order } = req.body;
+    const { email, statusid, jobstatus, oldjobstatus } = req.body;
     JobModel.updateOne(
       {
         email: email,
@@ -111,16 +158,40 @@ const jobControllers = {
       },
       {
         jobstatus: jobstatus,
-        order: order,
       }
     )
       .then((resultUpdate) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: resultUpdate,
-          message: "success edit new status/change status order",
-        });
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: {
+                description: "updated",
+                olditem: oldjobstatus,
+                status: jobstatus,
+              },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: resultUpdate,
+              message: "success edit new status/change status order",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to edit new status/change status order",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;

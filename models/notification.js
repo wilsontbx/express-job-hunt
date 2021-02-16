@@ -8,7 +8,7 @@ const notificationSchema = new mongoose.Schema({
   activity: [
     {
       description: { type: String, required: true, default: "" },
-      item: { type: String, required: true, default: "" },
+      olditem: { type: String, required: true, default: "" },
       companyname: { type: String, required: true, default: "" },
       jobname: { type: String, required: true, default: "" },
       status: { type: String, required: true, default: "" },
