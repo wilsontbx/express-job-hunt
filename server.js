@@ -16,9 +16,12 @@ app.use(
     extended: true,
   })
 );
+const devurl = "http://localhost:3000";
+const produrl = "";
+
 app.use(
   cors({
-    origin: "*",
+    origin: process.env.NODE_ENV === "development" ? devurl : produrl,
   })
 );
 app.options("*", cors());
