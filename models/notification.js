@@ -13,6 +13,7 @@ const notificationSchema = new mongoose.Schema({
       companyname: { type: String },
       jobname: { type: String },
       status: { type: String },
+      editnontitle: { type: String },
       created_at: {
         type: Date,
         required: true,

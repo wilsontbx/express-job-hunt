@@ -237,6 +237,15 @@ const jobControllers = {
       }
     )
       .then((resultUpdate) => {
+        let updateItemCompany = "";
+        let updateItemJob = "";
+        let updateStatus = false;
+        if (oldCompanyName !== companyname || oldJobName !== jobname) {
+          updateItemCompany = oldCompanyName;
+          updateItemJob = oldJobName;
+        } else {
+          updateStatus = true;
+        }
         NotificationModel.findOneAndUpdate(
           {
             email: email,
@@ -245,10 +254,11 @@ const jobControllers = {
             $push: {
               activity: {
                 description: "updated",
-                olditem: oldCompanyName,
-                olditemjob: oldJobName,
+                olditem: updateItemCompany,
+                olditemjob: updateItemJob,
                 companyname: companyname,
                 jobname: jobname,
+                editnontitle: updateStatus,
               },
             },
           }
@@ -497,6 +507,35 @@ const jobControllers = {
         res.json({
           success: false,
           message: "fail to delete job",
+        });
+      });
+  },
+  notification: (req, res) => {
+    const { email } = req.body;
+    NotificationModel.findOne({
+      email: email,
+    })
+      .then((allResult) => {
+        if (!allResult) {
+          res.statusCode = 401;
+          res.json({
+            success: false,
+            message: "The is notification column is empty",
+          });
+          return;
+        }
+        res.statusCode = 200;
+        res.json({
+          success: true,
+          message: "notification found",
+          allResult: allResult,
+        });
+      })
+      .catch((err) => {
+        res.statusCode = 401;
+        res.json({
+          success: false,
+          message: "user unauthorized (status)",
         });
       });
   },

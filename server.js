@@ -36,12 +36,11 @@ app.patch("/api/v1/drag/status", jobControllers.dragStatus);
 app.patch("/api/v1/drag/job", jobControllers.dragJob);
 app.delete("/api/v1/delete/status", jobControllers.deleteStatus);
 app.patch("/api/v1/delete/job", jobControllers.deleteJob);
+app.post("/api/v1/notification", jobControllers.notification);
 
 //USER ROUTES
 app.post("/api/v1/users/register", userControllers.register);
 app.post("/api/v1/users/login", userControllers.login);
-// app.post("/api/v1/users/getuserinfo", verifyJWT, userControllers.getUserInfo);
-// app.post("/api/v1/users/update", verifyJWT, userControllers.updateUserInfo);
 
 function verifyJWT(req, res, next) {
   // get the jwt token from the request header
