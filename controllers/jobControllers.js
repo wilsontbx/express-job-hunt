@@ -1,7 +1,6 @@
 const JobModel = require("../models/job");
 const shortid = require("shortid");
 const NotificationModel = require("../models/notification");
-const { emit } = require("../models/job");
 
 const jobControllers = {
   render: (req, res) => {
@@ -43,12 +42,33 @@ const jobControllers = {
       order: order,
     })
       .then((result) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: result,
-          message: "success create new status",
-        });
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: { description: "added", status: jobstatus },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: result,
+              message: "success create new status",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to create new status",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;
@@ -63,6 +83,7 @@ const jobControllers = {
     const {
       email,
       statusid,
+      statusName,
       companyname,
       jobname,
       preparation,
@@ -87,12 +108,38 @@ const jobControllers = {
       }
     )
       .then((result) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: result,
-          message: "success create new job",
-        });
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: {
+                description: "added",
+                companyname: companyname,
+                jobname: jobname,
+                status: statusName,
+              },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: result,
+              message: "success create new job",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to create new job",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;
@@ -103,7 +150,7 @@ const jobControllers = {
       });
   },
   updateStatus: (req, res) => {
-    const { email, statusid, jobstatus, order } = req.body;
+    const { email, statusid, jobstatus, oldjobstatus } = req.body;
     JobModel.updateOne(
       {
         email: email,
@@ -111,16 +158,40 @@ const jobControllers = {
       },
       {
         jobstatus: jobstatus,
-        order: order,
       }
     )
       .then((resultUpdate) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: resultUpdate,
-          message: "success edit new status/change status order",
-        });
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: {
+                description: "updated",
+                olditem: oldjobstatus,
+                status: jobstatus,
+              },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: resultUpdate,
+              message: "success edit new status/change status order",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to edit new status/change status order",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;
@@ -141,6 +212,8 @@ const jobControllers = {
       interviewquestion,
       interviewexperience,
       salary,
+      oldCompanyName,
+      oldJobName,
     } = req.body;
     const listId = shortid.generate();
     const jobidx = `joblist.${index}`;
@@ -164,12 +237,49 @@ const jobControllers = {
       }
     )
       .then((resultUpdate) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: resultUpdate,
-          message: "success edit job order",
-        });
+        let updateItemCompany = "";
+        let updateItemJob = "";
+        let updateStatus = false;
+        if (oldCompanyName !== companyname || oldJobName !== jobname) {
+          updateItemCompany = oldCompanyName;
+          updateItemJob = oldJobName;
+        } else {
+          updateStatus = true;
+        }
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: {
+                description: "updated",
+                olditem: updateItemCompany,
+                olditemjob: updateItemJob,
+                companyname: companyname,
+                jobname: jobname,
+                editnontitle: updateStatus,
+              },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: resultUpdate,
+              message: "success edit job order",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to edit job order",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;
@@ -232,6 +342,8 @@ const jobControllers = {
       oldorder,
       newstatusid,
       neworder,
+      oldStatus,
+      newStatus,
     } = req.body;
     JobModel.findOneAndUpdate(
       { email: email, _id: oldstatusid },
@@ -249,12 +361,43 @@ const jobControllers = {
           }
         )
           .then((resultUpdate) => {
-            res.statusCode = 201;
-            res.json({
-              success: true,
-              result: resultUpdate,
-              message: "success drag job order",
-            });
+            let description = "moved";
+            if (oldstatusid === newstatusid) {
+              description = "rearranged";
+            }
+            NotificationModel.findOneAndUpdate(
+              {
+                email: email,
+              },
+              {
+                $push: {
+                  activity: {
+                    description: description,
+                    olditem: oldStatus,
+                    status: newStatus,
+                    companyname: pullResult.companyname,
+                    jobname: pullResult.jobname,
+                  },
+                },
+              }
+            )
+              .then((resultNotification) => {
+                res.statusCode = 201;
+                res.json({
+                  success: true,
+                  result: resultUpdate,
+                  message: "success drag job order",
+                  activity: true,
+                });
+              })
+              .catch((err) => {
+                res.statusCode = 409;
+                res.json({
+                  success: false,
+                  message: "fail to drag job order",
+                  activity: false,
+                });
+              });
           })
           .catch((err) => {
             res.statusCode = 409;
@@ -273,18 +416,42 @@ const jobControllers = {
       });
   },
   deleteStatus: (req, res) => {
-    const { email, _id } = req.body;
+    const { email, _id, jobstatus } = req.body;
     JobModel.deleteOne({
       email: email,
       _id: _id,
     })
       .then((resultDelete) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: resultDelete,
-          message: "success delete status",
-        });
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: {
+                description: "deleted",
+                status: jobstatus,
+              },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: resultDelete,
+              message: "success delete status",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to delete status",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;
@@ -295,7 +462,7 @@ const jobControllers = {
       });
   },
   deleteJob: (req, res) => {
-    const { email, statusid, jobid } = req.body;
+    const { email, statusid, jobid, companyname, jobname } = req.body;
     JobModel.updateOne(
       {
         email: email,
@@ -306,18 +473,72 @@ const jobControllers = {
       }
     )
       .then((resultDelete) => {
-        res.statusCode = 201;
-        res.json({
-          success: true,
-          result: resultDelete,
-          message: "success delete job",
-        });
+        NotificationModel.findOneAndUpdate(
+          {
+            email: email,
+          },
+          {
+            $push: {
+              activity: {
+                description: "deleted",
+                companyname: companyname,
+                jobname: jobname,
+              },
+            },
+          }
+        )
+          .then((resultNotification) => {
+            res.statusCode = 201;
+            res.json({
+              success: true,
+              result: resultDelete,
+              message: "success delete job",
+              activity: true,
+            });
+          })
+          .catch((err) => {
+            res.statusCode = 409;
+            res.json({
+              success: false,
+              message: "fail to delete job",
+              activity: false,
+            });
+          });
       })
       .catch((err) => {
         res.statusCode = 409;
         res.json({
           success: false,
           message: "fail to delete job",
+        });
+      });
+  },
+  notification: (req, res) => {
+    const { email } = req.body;
+    NotificationModel.findOne({
+      email: email,
+    })
+      .then((allResult) => {
+        if (!allResult) {
+          res.statusCode = 401;
+          res.json({
+            success: false,
+            message: "The is notification column is empty",
+          });
+          return;
+        }
+        res.statusCode = 200;
+        res.json({
+          success: true,
+          message: "notification found",
+          allResult: allResult,
+        });
+      })
+      .catch((err) => {
+        res.statusCode = 401;
+        res.json({
+          success: false,
+          message: "user unauthorized (status)",
         });
       });
   },

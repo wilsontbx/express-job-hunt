@@ -7,11 +7,13 @@ const notificationSchema = new mongoose.Schema({
   },
   activity: [
     {
-      description: { type: String, required: true, default: "" },
-      item: { type: String, required: true, default: "" },
-      companyname: { type: String, required: true, default: "" },
-      jobname: { type: String, required: true, default: "" },
-      status: { type: String, required: true, default: "" },
+      description: { type: String },
+      olditem: { type: String },
+      olditemjob: { type: String },
+      companyname: { type: String },
+      jobname: { type: String },
+      status: { type: String },
+      editnontitle: { type: String },
       created_at: {
         type: Date,
         required: true,
