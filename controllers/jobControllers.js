@@ -345,7 +345,6 @@ const jobControllers = {
       oldStatus,
       newStatus,
     } = req.body;
-    console.log(req.body);
     JobModel.findOneAndUpdate(
       { email: email, _id: oldstatusid },
       { $pull: { joblist: { _id: jobid } } },
@@ -362,6 +361,10 @@ const jobControllers = {
           }
         )
           .then((resultUpdate) => {
+            let description = "moved";
+            if (oldstatusid === newstatusid) {
+              description = "rearranged";
+            }
             NotificationModel.findOneAndUpdate(
               {
                 email: email,
@@ -369,7 +372,7 @@ const jobControllers = {
               {
                 $push: {
                   activity: {
-                    description: "moved",
+                    description: description,
                     olditem: oldStatus,
                     status: newStatus,
                     companyname: pullResult.companyname,
