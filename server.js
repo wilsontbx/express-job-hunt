@@ -30,16 +30,16 @@ app.options("*", cors());
 app.get("/", (req, res) => {
   res.send("Welcome to Job Hunt api");
 });
-app.post("/api/v1/render", jobControllers.render);
-app.post("/api/v1/create/status", jobControllers.createStatus);
-app.post("/api/v1/create/job", jobControllers.createJob);
-app.patch("/api/v1/update/status", jobControllers.updateStatus);
-app.patch("/api/v1/update/job", jobControllers.updateJob);
-app.patch("/api/v1/drag/status", jobControllers.dragStatus);
-app.patch("/api/v1/drag/job", jobControllers.dragJob);
-app.delete("/api/v1/delete/status", jobControllers.deleteStatus);
-app.patch("/api/v1/delete/job", jobControllers.deleteJob);
-app.post("/api/v1/notification", jobControllers.notification);
+app.post("/api/v1/render", verifyJWT, jobControllers.render);
+app.post("/api/v1/create/status", verifyJWT, jobControllers.createStatus);
+app.post("/api/v1/create/job", verifyJWT, jobControllers.createJob);
+app.patch("/api/v1/update/status", verifyJWT, jobControllers.updateStatus);
+app.patch("/api/v1/update/job", verifyJWT, jobControllers.updateJob);
+app.patch("/api/v1/drag/status", verifyJWT, jobControllers.dragStatus);
+app.patch("/api/v1/drag/job", verifyJWT, jobControllers.dragJob);
+app.delete("/api/v1/delete/status", verifyJWT, jobControllers.deleteStatus);
+app.patch("/api/v1/delete/job", verifyJWT, jobControllers.deleteJob);
+app.post("/api/v1/notification", verifyJWT, jobControllers.notification);
 
 //USER ROUTES
 app.post("/api/v1/users/register", userControllers.register);
