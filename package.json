@@ -1,6 +1,9 @@
 {
   "name": "express-job-hunt",
   "version": "1.0.0",
+  "engine": {
+    "node": " 15.6.0"
+  },
   "description": "",
   "main": "server.js",
   "scripts": {
