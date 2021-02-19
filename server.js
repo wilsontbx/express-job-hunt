@@ -17,7 +17,7 @@ app.use(
   })
 );
 const devurl = "http://localhost:3000";
-const produrl = "https://jobhunt-app.herokuapp.com/";
+const produrl = "https://jobhunt-app.herokuapp.com";
 
 app.use(
   cors({
